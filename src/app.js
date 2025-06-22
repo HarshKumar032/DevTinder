@@ -1,23 +1,28 @@
-const express=require("express");
-const app=express();
+const express = require("express");
+const app = express();
 
-app.get("/user",(req,res)=>{
-    res.send({"firstname":"harsh","lastname":"Shaw"});
-})
+const { userauth, adminauth } = require("./middlewares/auth.js");
 
-app.post("/user",(req,res)=>{
-    res.send("DB updated succesfully");
-})
+app.post("/user/login", (req, res) => {
+  res.send("User logged in succesfully"); //login do not require authentication
+});
 
-app.delete("/user",(req,res)=>{
-    res.send("Data deleted succesfully");
-})
+//Routes get executed in sequential manner
+app.use("/user", userauth);
+app.use("/admin", adminauth);
 
-//This app.use() will match all http call methods to /test
-app.use("/test",(req,res)=>{
-    res.send("Just Testing");
-})
+app.post("/admin/sentData", (req, res) => {
+  res.send("Admin data sent!");
+});
 
-app.listen(3000,()=>{
-    console.log("Server started on PORT 3000...");
+app.post("/user/sentData", (req, res) => {
+  res.send("Data sent!");
+});
+
+app.delete("/user/deleteData", (req, res) => {
+  res.send("Data deleted!");
+});
+
+app.listen(3000, () => {
+  console.log("Server started on PORT 3000...");
 });
