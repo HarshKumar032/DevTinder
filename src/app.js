@@ -1,28 +1,27 @@
 const express = require("express");
+const { connectDB } = require("./config/db.js");
 const app = express();
+const { user } = require("./models/user.js");
 
-const { userauth, adminauth } = require("./middlewares/auth.js");
+app.post("/signup", async (req, res) => {
+  const User = new user({
+    firstName: "Dharmendra",
+    lastname: "Shaw",
+    password: "Dk",
+    age: 52,
+  });
 
-app.post("/user/login", (req, res) => {
-  res.send("User logged in succesfully"); //login do not require authentication
+  try {
+    await User.save();
+    res.send("User added succesfully...");
+  } catch (error) {
+    console.error("Error occured...");
+  }
 });
 
-//Routes get executed in sequential manner
-app.use("/user", userauth);
-app.use("/admin", adminauth);
-
-app.post("/admin/sentData", (req, res) => {
-  res.send("Admin data sent!");
-});
-
-app.post("/user/sentData", (req, res) => {
-  res.send("Data sent!");
-});
-
-app.delete("/user/deleteData", (req, res) => {
-  res.send("Data deleted!");
-});
-
-app.listen(3000, () => {
-  console.log("Server started on PORT 3000...");
+connectDB().then(() => {
+  console.log("Database connected succesfully...");
+  app.listen(3000, () => {
+    console.log("Server started on PORT 3000...");
+  });
 });
