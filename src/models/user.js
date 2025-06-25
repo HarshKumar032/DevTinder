@@ -13,10 +13,13 @@ const userSchema = new mongoose.Schema({
   age: {
     type: Number,
   },
+  email: {
+    type: String,
+  },
 });
 
 const user = mongoose.model("usermodel", userSchema);
 
-module.exports={
-    user
-}
+module.exports = {
+  user,
+};
