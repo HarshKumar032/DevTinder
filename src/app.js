@@ -14,6 +14,7 @@ app.post("/signup", async (req, res) => {
     res.send("User added succesfully...");
   } catch (error) {
     console.error("Error occured...");
+    res.status(400).send(error.message);
   }
 });
 
@@ -50,14 +51,26 @@ app.delete("/user", async (req, res) => {
 });
 
 //API to update a user with a given userId
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
   try {
-    const personId = req.body.userId;
+    const personId = req.params.userId;
     const data = req.body;
-    await user.findByIdAndUpdate(personId, data);
-    res.send("User updated succesfully...");
+
+    const allowed_fields = ["age", "about", "gender", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      allowed_fields.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed for some feilds");
+    } else if (data.skills.length > 10) {
+      throw new Error("Skills cannot be more than 10..");
+    } else {
+      await user.findByIdAndUpdate(personId, data);
+      res.send("User updated succesfully...");
+    }
   } catch (error) {
     console.error("Something went wrong");
+    res.status(400).send(error.message);
   }
 });
 
@@ -72,7 +85,6 @@ app.patch("/update", async (req, res) => {
     console.error("something went wrong...");
   }
 });
-
 
 connectDB().then(() => {
   console.log("Database connected succesfully...");
