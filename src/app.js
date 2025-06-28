@@ -5,8 +5,12 @@ const { user } = require("./models/user.js");
 const bcrypt = require("bcrypt");
 const { validatesignup } = require("./utils/validation.js");
 const validator = require("validator");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userauth } = require("./middlewares/auth.js");
 
 app.use(express.json()); //will apply to all http methods->used for converting json to js object
+app.use(cookieParser()); //middleware for reading the cookies
 
 //API for adding a new user
 app.post("/signup", async (req, res) => {
@@ -56,6 +60,12 @@ app.post("/login", async (req, res) => {
       throw new Error("Incorrect password.");
     }
 
+    //Sending the JWT
+    const token = jwt.sign({ _id: person._id }, "DevTinder@4321", {
+      expiresIn: "8h",
+    });
+    res.cookie("token", token);
+
     // Success response
     res.send("User logged in successfully...");
   } catch (error) {
@@ -64,71 +74,24 @@ app.post("/login", async (req, res) => {
   }
 });
 
-//API to GET user by emailId
-app.get("/user", async (req, res) => {
+//API for getting the user profile
+app.get("/profile", userauth, async (req, res) => {
   try {
-    const person = await user.find({ email: req.body.email });
-    res.send(person);
+    const person = req.user;
+    res.status(200).send(person);
   } catch (error) {
-    console.error("Something went wrong");
-  }
-});
-
-//API to get feed of all users
-app.get("/feed", async (req, res) => {
-  try {
-    const person = await user.find({});
-    res.send(person);
-  } catch (error) {
-    console.error("Something went wrong");
-  }
-});
-
-//API to delete a user
-app.delete("/user", async (req, res) => {
-  try {
-    const personId = req.body.userId;
-    //await user.findByIdAndDelete({_id:personId}); //We can do this also
-    await user.findByIdAndDelete(personId);
-    res.send("User deleted succesfully...");
-  } catch (error) {
-    console.error("Something went wrong");
-  }
-});
-
-//API to update a user with a given userId
-app.patch("/user/:userId", async (req, res) => {
-  try {
-    const personId = req.params.userId;
-    const data = req.body;
-
-    const allowed_fields = ["age", "about", "gender", "skills"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      allowed_fields.includes(k)
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed for some feilds");
-    } else if (data.skills.length > 10) {
-      throw new Error("Skills cannot be more than 10..");
-    } else {
-      await user.findByIdAndUpdate(personId, data);
-      res.send("User updated succesfully...");
-    }
-  } catch (error) {
-    console.error("Something went wrong");
+    console.error("Profile fetch error:", error.message);
     res.status(400).send(error.message);
   }
 });
 
-//API to update a user with a given email
-app.patch("/update", async (req, res) => {
+//API for sending the connection request
+app.post("/sendconnectionrequest", userauth, (req, res) => {
   try {
-    const person_email = req.body.email;
-    const data = req.body;
-    await user.findOneAndUpdate({ email: person_email }, data);
-    res.send("user updated succesfully...");
+    const person = req.user;
+    res.send(person.firstName + " sent connection request..");
   } catch (error) {
-    console.error("something went wrong...");
+    res.status(400).send(error.message);
   }
 });
 
