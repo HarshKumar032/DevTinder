@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new mongoose.Schema(
   {
@@ -13,7 +14,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
-      unique: [true,"This Email id already exists"],
+      unique: [true, "This Email id already exists"],
       lowercase: true,
       trim: true,
     },
@@ -42,6 +43,21 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.methods.validatepassword = async function (userinputpassword) {
+  // 'this' refers to the current user document
+  const user = this;
+
+  // Compare the provided password with the hashed password stored in DB
+  const isPasswordValid = await bcrypt.compare(
+    userinputpassword,
+    user.password
+  );
+
+  // Return true or false
+  return isPasswordValid;
+};
+
 
 const user = mongoose.model("User", userSchema);
 

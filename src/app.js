@@ -55,15 +55,14 @@ app.post("/login", async (req, res) => {
     }
 
     // Compare password
-    const isPasswordValid = await bcrypt.compare(password, person.password);
-    if (!isPasswordValid) {
-      throw new Error("Incorrect password.");
+    const isValid = await person.validatepassword(password); //schema method
+
+    if (!isValid) {
+      return res.status(401).send("Invalid password");
     }
 
     //Sending the JWT
-    const token = jwt.sign({ _id: person._id }, "DevTinder@4321", {
-      expiresIn: "8h",
-    });
+    const token = await jwt.sign({ _id: person._id }, "DevTinder@4321");
     res.cookie("token", token);
 
     // Success response
