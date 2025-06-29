@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const userRouter = express.Router();
 
-//API for adding a new user
+//API for signup or adding a new user
 userRouter.post("/signup", async (req, res) => {
   try {
     validatesignup(req); //validating the input data
