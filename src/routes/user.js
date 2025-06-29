@@ -68,4 +68,10 @@ userRouter.post("/login", async (req, res) => {
   }
 });
 
+//API for logout
+userRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, { expires: new Date(Date.now()) });
+  res.send("User logged out succesfully...")
+});
+
 module.exports = userRouter;

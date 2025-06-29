@@ -1,11 +1,13 @@
 const validator = require("validator");
 
 const validatesignup = (req) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, photourl } = req.body;
 
   // Validate presence
   if (!firstName || !lastName || !email || !password) {
-    throw new Error("All fields (first name, last name, email, password) are required.");
+    throw new Error(
+      "All fields (first name, last name, email, password) are required."
+    );
   }
 
   // Validate name length
@@ -23,14 +25,18 @@ const validatesignup = (req) => {
   }
 
   // Validate password strength
-  if (!validator.isStrongPassword(password, {
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 1,
-  })) {
-    throw new Error("Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.");
+  if (
+    !validator.isStrongPassword(password, {
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    })
+  ) {
+    throw new Error(
+      "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol."
+    );
   }
 };
 

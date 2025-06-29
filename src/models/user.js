@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const validator=require("validator")
 
 const userSchema = new mongoose.Schema(
   {
@@ -38,6 +39,16 @@ const userSchema = new mongoose.Schema(
     skills: {
       type: [String],
     },
+    photourl: {
+      type: String,
+      default:
+        "https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg",
+      validate(value) {
+        if (!validator.isURL) {
+          throw new Error("Invalid photo url..");
+        }
+      },
+    },
   },
   {
     timestamps: true,
@@ -57,7 +68,6 @@ userSchema.methods.validatepassword = async function (userinputpassword) {
   // Return true or false
   return isPasswordValid;
 };
-
 
 const user = mongoose.model("User", userSchema);
 
