@@ -9,8 +9,9 @@ app.use(cookieParser()); //middleware for reading the cookies
 const userRouter = require("./routes/user.js");
 const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
+const viewRouter = require("./routes/view.js");
 
-app.use("/",userRouter,profileRouter,requestRouter);
+app.use("/",userRouter,profileRouter,requestRouter,viewRouter);
 
 connectDB().then(() => {
   console.log("Database connected succesfully...");
