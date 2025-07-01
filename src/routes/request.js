@@ -63,7 +63,58 @@ requestRouter.post(
         data,
       });
     } catch (error) {
-      res.status(400).json({ message:  error.message });
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
+requestRouter.post(
+  "/request/review/:status/:reqId",
+  userauth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const status = req.params.status.toLowerCase();
+      const reqId = req.params.reqId;
+
+      // Validate status
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid status type: " + status });
+      }
+
+      // Validate ObjectId format
+      if (!mongoose.Types.ObjectId.isValid(reqId)) {
+        return res.status(400).json({ message: "Invalid request ID format" });
+      }
+
+      // Check if the request exists and is still "interested"
+      const validConnectionRequest = await connectionRequest.findOne({
+        _id: reqId,
+        status: "interested",
+        toUserId: loggedInUser._id,
+      });
+
+      if (!validConnectionRequest) {
+        return res
+          .status(404)
+          .json({ message: "Invalid or already reviewed connection request." });
+      }
+
+      // Update the request status
+      validConnectionRequest.status = status;
+      const updatedRequest = await validConnectionRequest.save();
+
+      res.json({
+        message: "Connection request " + status,
+        request: updatedRequest,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Internal server error: " + error.message });
     }
   }
 );
