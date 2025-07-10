@@ -2,7 +2,14 @@ const express = require("express");
 const app = express();
 const { connectDB } = require("./config/db.js");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
+app.use(
+  cors({
+    origin: "",
+    credentials: true,
+  })
+);
 app.use(express.json()); //will apply to all http methods->used for converting json to js object
 app.use(cookieParser()); //middleware for reading the cookies
 
@@ -11,7 +18,7 @@ const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
 const viewRouter = require("./routes/view.js");
 
-app.use("/",userRouter,profileRouter,requestRouter,viewRouter);
+app.use("/", userRouter, profileRouter, requestRouter, viewRouter);
 
 connectDB().then(() => {
   console.log("Database connected succesfully...");

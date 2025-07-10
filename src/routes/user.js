@@ -61,7 +61,7 @@ userRouter.post("/login", async (req, res) => {
     res.cookie("token", token);
 
     // Success response
-    res.send("User logged in successfully...");
+    res.send(person);
   } catch (error) {
     console.error("Login error:", error.message);
     res.status(400).send(error.message);

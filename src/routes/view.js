@@ -1,6 +1,7 @@
 const express = require("express");
 const { userauth } = require("../middlewares/auth");
 const connectionRequest = require("../models/connectionRequest");
+const { user } = require("../models/user");
 const viewRouter = express.Router();
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
@@ -43,12 +44,13 @@ viewRouter.get("/view/connections", userauth, async (req, res) => {
     // Fetch all connection requests where:
     // - the user is either the sender or the receiver
     // - and the status of the connection is "accepted"
-    const connectionRequests = await connectionRequest.find({
-      $or: [
-        { toUserId: loggedInUser._id, status: "accepted" },
-        { fromUserId: loggedInUser._id, status: "accepted" },
-      ],
-    })
+    const connectionRequests = await connectionRequest
+      .find({
+        $or: [
+          { toUserId: loggedInUser._id, status: "accepted" },
+          { fromUserId: loggedInUser._id, status: "accepted" },
+        ],
+      })
       // Populate details of the sender and receiver with only safe fields
       .populate("fromUserId", USER_SAFE_DATA)
       .populate("toUserId", USER_SAFE_DATA);
@@ -68,6 +70,43 @@ viewRouter.get("/view/connections", userauth, async (req, res) => {
   } catch (err) {
     // Handle any errors during the process
     res.status(400).send({ message: err.message });
+  }
+});
+
+//API to view feeds
+viewRouter.get("/view/feed", userauth, async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
+
+    const connectionRequests = await connectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId  toUserId");
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const users = await user
+      .find({
+        $and: [
+          { _id: { $nin: Array.from(hideUsersFromFeed) } },
+          { _id: { $ne: loggedInUser._id } },
+        ],
+      })
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ data: users });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
