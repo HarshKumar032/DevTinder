@@ -68,7 +68,7 @@ requestRouter.post(
   }
 );
 
-//API for reviwing the connection request
+//API for reviewing the connection request
 requestRouter.post(
   "/request/review/:status/:reqId",
   userauth,
