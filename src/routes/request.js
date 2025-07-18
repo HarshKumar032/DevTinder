@@ -79,7 +79,7 @@ requestRouter.post(
       const reqId = req.params.reqId;
 
       // Validate status
-      const allowedStatus = ["accepted", "rejected"];
+      const allowedStatus = ["accept", "reject"];
       if (!allowedStatus.includes(status)) {
         return res
           .status(400)

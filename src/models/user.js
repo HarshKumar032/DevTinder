@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema(
     },
     photourl: {
       type: String,
-      default: "https://api.dicebear.com/6.x/pixel-art/svg?seed=Harsh",
+      default: "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-gray-placeholder-vector-illustration-378729425.jpg",
       validate(value) {
         if (!validator.isURL) {
           throw new Error("Invalid photo url..");

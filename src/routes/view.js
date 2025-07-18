@@ -4,7 +4,7 @@ const connectionRequest = require("../models/connectionRequest");
 const { user } = require("../models/user");
 const viewRouter = express.Router();
 
-const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
+const USER_SAFE_DATA = "firstName lastName photourl age gender about skills";
 
 // API to get all pending connection requests for the logged-in user
 viewRouter.get("/view/request/pending", userauth, async (req, res) => {
@@ -24,7 +24,7 @@ viewRouter.get("/view/request/pending", userauth, async (req, res) => {
     // Respond with the pending requests and their count
     res.status(200).json({
       count: pendingRequests.length, // Helpful for frontend (e.g., showing a badge)
-      requests: pendingRequests,
+      data: pendingRequests,
     });
   } catch (error) {
     // Catch and return any errors during DB operations
@@ -47,8 +47,8 @@ viewRouter.get("/view/connections", userauth, async (req, res) => {
     const connectionRequests = await connectionRequest
       .find({
         $or: [
-          { toUserId: loggedInUser._id, status: "accepted" },
-          { fromUserId: loggedInUser._id, status: "accepted" },
+          { toUserId: loggedInUser._id, status: "accept" },
+          { fromUserId: loggedInUser._id, status: "accept" },
         ],
       })
       // Populate details of the sender and receiver with only safe fields

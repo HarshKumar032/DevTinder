@@ -22,7 +22,17 @@ userRouter.post("/signup", async (req, res) => {
     });
 
     await User.save();
-    res.send("User added successfully...");
+
+    //Sending the JWT
+    const token = await jwt.sign({ _id: User._id }, "DevTinder@4321", {
+      expiresIn: "7d",
+    });
+    res.cookie("token", token);
+
+    res.status(201).json({
+      message: "User created",
+      data: User,
+    });
   } catch (error) {
     console.error("Signup error:", error.message);
     res.status(400).send(error.message);
@@ -57,7 +67,9 @@ userRouter.post("/login", async (req, res) => {
     }
 
     //Sending the JWT
-    const token = await jwt.sign({ _id: person._id }, "DevTinder@4321");
+    const token = await jwt.sign({ _id: person._id }, "DevTinder@4321", {
+      expiresIn: "7d",
+    });
     res.cookie("token", token);
 
     // Success response
@@ -71,7 +83,7 @@ userRouter.post("/login", async (req, res) => {
 //API for logout
 userRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()) });
-  res.send("User logged out succesfully...")
+  res.send("User logged out succesfully...");
 });
 
 module.exports = userRouter;

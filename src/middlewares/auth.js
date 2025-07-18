@@ -14,7 +14,7 @@ const userauth = async (req, res, next) => {
 
     // Verify and decode the token using JWT secret
     // This will throw an error if the token is invalid or expired
-    const decoded_token = jwt.verify(token, "DevTinder@4321"); // Use process.env.JWT_SECRET in production
+    const decoded_token = jwt.verify(token, process.env.JWT_SECRET); // Use process.env.JWT_SECRET in production
 
     // Extract user ID from the decoded token
     const { _id } = decoded_token;
