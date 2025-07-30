@@ -23,6 +23,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    membershipType: {
+      type: String,
+    },
     age: {
       type: Number,
       min: [18, "Minimum age is 18"],
@@ -41,7 +48,8 @@ const userSchema = new mongoose.Schema(
     },
     photourl: {
       type: String,
-      default: "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-gray-placeholder-vector-illustration-378729425.jpg",
+      default:
+        "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-gray-placeholder-vector-illustration-378729425.jpg",
       validate(value) {
         if (!validator.isURL) {
           throw new Error("Invalid photo url..");

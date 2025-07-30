@@ -3,7 +3,7 @@ const app = express();
 const { connectDB } = require("./config/db.js");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-require('dotenv').config();
+require("dotenv").config();
 
 app.use(
   cors({
@@ -18,8 +18,17 @@ const userRouter = require("./routes/user.js");
 const profileRouter = require("./routes/profile.js");
 const requestRouter = require("./routes/request.js");
 const viewRouter = require("./routes/view.js");
+const paymentRouter = require("./routes/payment.js");
+app.use("/", chatRouter);
 
-app.use("/", userRouter, profileRouter, requestRouter, viewRouter);
+const server = http.createServer(app);
+initializeSocket(server);
+
+app.use("/", userRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", viewRouter);
+app.use("/", paymentRouter);
 
 connectDB().then(() => {
   console.log("Database connected succesfully...");
